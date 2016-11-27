@@ -1,0 +1,183 @@
+---
+# Copyright (c) 2016, Department for Business, Energy & Industrial Strategy
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of the <organization> nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL BIS BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+- name: Install the master IPA server
+  shell:
+    ipa-server-install --unattended
+    --realm {{ ipaserver_realm }}
+    --domain {{ ipaserver_domain }}
+    -a{{ ipaserver_admin_password }}
+    -p{{ ipaserver_dir_mgmt_password }}
+    --hostname={{ inventory_hostname }}
+    --ip-address={{ hostvars[inventory_hostname]['ansible_host'] }}
+    {{ '--idstart=%s' % ipaserver_idstart if ipaserver_idstart | default(False) else '' }}
+    {{ '--idmax=%s' % ipaserver_idmax if ipaserver_idmax | default(False) else '' }}
+    {{ '--forwarder=%s' % ipaserver_dns_forwarder
+       if ipaserver_dns_forwarder | default(False) else '--no-forwarders' }}
+    {{ '--mkhomedir' if ipaserver_mkhomedir | default(True) else '' }}
+    {{ '--setup-dns' if ipaserver_setup_dns | default(True) else '' }}
+    {{ '--no-host-dns' if ipaserver_host_dns | default(True) else '' }}
+    {{ '--ssh-trust-dns' if ipaserver_ssh_trust_dns | default(True) else '' }}
+    {{ '' if ipaserver_hbac_allow | default(True) else '--no_hbac_allow' }}
+    {{ '' if ipaserver_setup_ntp | default(True) else '--no-ntp' }}
+    {{ '' if ipaserver_configure_ssh | default(True) else '--no-ssh' }}
+    {{ '' if ipaserver_configure_sshd | default(True) else '--no-sshd' }}
+    {{ '' if ipaserver_ui_redirect | default(True) else '--no-ui-redirect' }}
+    {{ '--log-file=/tmp/ipaserver_installer.log' }}
+  args:
+    executable: /bin/bash
+    creates: /etc/ipa/default.conf
+
+##### I HAVE NO IDEA WHY THIS IS NECESSARY #####
+
+# Check if ipaserver_keytab exists. If it does, the admin password should not
+# be changed.
+- name: Check for keytab
+  stat: path={{ ipaserver_keytab }}
+  register: ktf
+
+#- name: Stop IPA
+#  service: name=ipa state=stopped
+#  when: ktf.stat.exists == False
+
+#- name: Generate SSHA hash for ipaserver_admin_password
+#  shell:
+#    /usr/bin/pwdhash "{{ ipaserver_admin_password }}"
+#  register: ipaserver_admin_password_hash
+#  when: ktf.stat.exists == False
+
+#- name: Set nsslapd-rootpw to SSHA hash for ipaserver_admin_password
+#  lineinfile: 
+#    dest: /etc/dirsrv/slapd-{{ ipaserver_realm | regex_replace('\.', '-') }}/dse.ldif
+#    regexp: '^nsslapd-rootpw:\s.*' 
+#    line: 'nsslapd-rootpw: {{ ipaserver_admin_password_hash.stdout }}'
+#  when: ktf.stat.exists == False
+
+#- name: Start IPA
+#  service: name=ipa state=started
+#  when: ktf.stat.exists == False
+
+#- name: Wait for Kerberos
+#  wait_for: host={{ inventory_hostname }} port=88 state=present
+#  when: ktf.stat.exists == False
+
+- name: Set LDAP password for admin
+  shell:
+    ldappasswd -ZZ -D 'cn=directory manager' -w{{ ipaserver_dir_mgmt_password }}
+      -s{{ ipaserver_admin_password }}
+      uid=admin,cn=users,cn=accounts,dc=licensing,dc=service,dc=trade,dc=gov,dc=uk,dc=test
+      -H ldap://{{ inventory_hostname }}
+  when: ktf.stat.exists == False
+
+##### NOW I COMPLETELY UNDERSTAND #####
+
+- name: Create a keytab file
+  shell:
+    echo {{ ipaserver_admin_password }} | kinit admin@{{ ipaserver_realm }} ;
+    ipa-getkeytab -s {{ inventory_hostname }} -p admin@{{ ipaserver_realm }} 
+      -k {{ ipaserver_keytab }}
+  args:
+    executable: /bin/bash
+    creates: "{{ ipaserver_keytab }}"
+
+# This shall be removed once > 4.2.1 becomes available.
+# https://fedorahosted.org/freeipa/ticket/4561
+- name: Insert reverse zones
+  shell:
+    kinit admin -k -t {{ ipaserver_keytab }} ;
+    ipa dnszone-add {{ item }}
+  with_items:
+    - "{{ ipa_reverse_zones }}"
+  register: reverse_result
+  failed_when: "reverse_result.rc != 0 and 'no modifications to be performed' \
+                not in reverse_result.stderr and 'already exists' not \
+                in reverse_result.stderr"
+
+# The following registers a host, generates a password and registers a fact.
+- name: Create host entries for replica servers
+  shell:
+    kinit admin -k -t {{ ipaserver_keytab }} ;
+    ipa host-add {{ item }} --random --ip-address {{ hostvars[item]['ansible_host'] }}
+      2>/root/replicas-{{ item.split('.')[0] }}.log | grep "Random password" |
+      awk -F':' '{print$2}' | xargs | tee /root/replicas-{{ item.split('.')[0] }}.log
+  args:
+    executable: /bin/bash
+    creates: /root/replicas-{{ item.split('.')[0] }}.log
+  register: replicas
+  with_items:
+    - "{{ groups['ukbeis-mgmt-ipa-replicas'] }}"
+
+- name: debug replicas
+  debug: var=item.item
+  with_items:
+    - "{{ replicas.results }}"
+
+- name: Promote replicas.results.item.stdout as fact
+  set_fact: 
+    "{{ item.item.split('.')[0] ~ '_passwd' }}": "{{ item.stdout.strip() }}"
+  when: "'{{ item.stdout }}' is defined"
+  with_items:
+    - "{{ replicas.results }}"
+
+- name: Output host_passwd fact
+  debug: var={{ hostvars[groups['ukbeis-mgmt-ipa-masters'][0]][item.split('.')[0] ~ '_passwd'] }}
+  with_items:
+    - "{{ groups['ukbeis-mgmt-ipa-replicas'] }}"
+  ignore_errors: yes
+
+- name: Add replica servers to ipaserver group
+  shell:
+    kinit admin -k -t {{ ipaserver_keytab }} ;
+    ipa hostgroup-add-member ipaservers --hosts {{ item }} 2>&1 | tee 
+      /root/replicas-{{ item.split('.')[0] }}.log ;
+  args:
+    executable: /bin/bash
+    creates: /root/replicas-{{ item.split('.')[0] }}.log
+  with_items:
+    - "{{ groups['ukbeis-mgmt-ipa-replicas'] }}"
+
+- name: Add reverse DNS entries
+  shell:
+    kinit admin -k -t {{ ipaserver_keytab }} ;
+    ip_addr={{ hostvars[item]['ansible_host'] }} ;
+    ipa dnsrecord-add 100.100.10.in-addr.arpa. ${ip_addr##*.} --ptr-rec {{ item }}. 
+      2>&1 | tee /root/replicas-reverse-{{ item.split('.')[0] }}.log ;
+  args:
+    executable: /bin/bash
+    creates: /root/replicas-reverse-{{ item.split('.')[0] }}.log
+  register: reverse_entries
+  failed_when: "'no modifications to be performed' not in reverse_entries.stderr \
+                and reverse_entries.rc != 0"
+  with_items:
+    - "{{ groups['ukbeis-mgmt-ipa'] }}"
+
+- name: Fetch files from primary ipa server
+  fetch: src={{ item }} dest=/tmp/{{ item | basename }} flat=yes
+  with_items:
+    - '/root/cacert.p12'
+    - '/root/ca-agent.p12'
+    - "{{ ipaserver_keytab }}"
+
