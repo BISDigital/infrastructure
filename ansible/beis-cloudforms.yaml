@@ -44,5 +44,5 @@
       creates: /root/ipa_{{ item }}.log
     with_items:
       - "{{ groups['beis-mgmt-cloudforms'] }}"
-    when: "{{ hostvars[inventory_hostname]['iparole'] == 'primary' }}"
+    when: "{{ hostvars[inventory_hostname]['iparole'] == 'master' }}"
     become: yes
