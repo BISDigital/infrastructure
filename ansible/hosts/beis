@@ -31,9 +31,15 @@ ukbeisep01.licensing.service.trade.gov.uk.test ansible_host=10.100.254.11
 ukbeisns01.licensing.service.trade.gov.uk.test ansible_host=10.100.254.21 dnsrole=master
 ukbeisns02.licensing.service.trade.gov.uk.test ansible_host=10.100.254.22 dnsrole=slave
 
-[beis-mgmt-ipa]
-ukbeisipa01.licensing.service.trade.gov.uk.test ansible_host=10.100.100.11 iparole=primary
+[beis-mgmt-ipa-masters]
+ukbeisipa01.licensing.service.trade.gov.uk.test ansible_host=10.100.100.11 iparole=master
+
+[beis-mgmt-ipa-replicas]
 ukbeisipa02.licensing.service.trade.gov.uk.test ansible_host=10.100.100.12 iparole=replica
+
+[beis-mgmt-ipa:children]
+beis-mgmt-ipa-masters
+beis-mgmt-ipa-replicas
 
 [beis-app]
 ukbeisalb01.licensing.service.trade.gov.uk.test ansible_host=10.100.1.5
