@@ -55,18 +55,18 @@
               line="{{ hostvars[item]['ansible_host'] }}\t{{ hostvars[item]['inventory_hostname'] }}\t{{ hostvars[item]['ansible_hostname'] }}"
   with_items: "{{ groups['beis-mgmt-ipa'] }}"
 
-- include: primary.yaml
-  when: "{{ hostvars[inventory_hostname]['iparole'] == 'primary' }}"
+- include: master.yaml
+  when: "{{ hostvars[inventory_hostname]['iparole'] == 'master' }}"
   tags:
-    - primary
+    - masters
 
-- include: dnsentries.yaml
-  when: "{{ hostvars[inventory_hostname]['iparole'] == 'primary' }}"
-  tags:
-    - dnsentries
-
-#- include: replica.yaml
-#  when: "{{ hostvars[inventory_hostname]['iparole'] == 'replica' }}"
+#- include: dnsentries.yaml
+#  when: "{{ hostvars[inventory_hostname]['iparole'] == 'master' }}"
 #  tags:
-#    - replica
+#    - dnsentries
+
+- include: replica.yaml
+  when: "{{ hostvars[inventory_hostname]['iparole'] == 'replica' }}"
+  tags:
+    - replicas
 

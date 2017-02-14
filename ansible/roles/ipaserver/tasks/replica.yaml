@@ -30,24 +30,31 @@
 - name: Update replica resolv.conf for autodiscovery
   template: src=resolv.conf.j2 dest=/etc/resolv.conf mode=0644
 
-- name: debug ipa_replicas
-  debug: var=ipa_host_pass
-  when: ipa_host_pass is defined
-
 - name: Install the IPA client
   shell:
-    ipa-client-install --unattended --password {{ ipa_host_pass }}
+    ipa-client-install --force-ntpd --enable-dns-updates --mkhomedir
+      --password {{ hostvars[groups['beis-mgmt-ipa-masters'][0]][inventory_hostname.split('.')[0] ~ '_passwd'] }} 
+      --unattended
   args:
     executable: /bin/bash
     creates: /etc/ipa/default.conf
-  when: ipa_host_pass is defined
+  when: "'{{ hostvars[groups['beis-mgmt-ipa-masters'][0]][inventory_hostname.split('.')[0] ~ '_passwd'] }}' is defined"
+
+- name: Check if this is a replica
+  shell:
+    ipa-replica-conncheck --replica={{ inventory_hostname }}
+  register: replica_conncheck
+  ignore_errors: yes
+
+- name: Replica connection check
+  debug: var=replica_conncheck
 
 - name: Install the replica
   shell:
-     kinit admin -k -t {{ ipaserver_keytab }} ;
+     kinit -kt {{ ipaserver_keytab }} admin@{{ ipaserver_realm }} ;
      ipa-replica-install --unattended --mkhomedir --setup-dns --setup-ca 
        --no-forwarders --skip-conncheck --principal admin
   args:
     executable: /bin/bash
-#    creates: /etc/ipa/default.conf
-  when: ipa_host_pass is defined
+  when: "replica_conncheck.rc != 0"
+  

@@ -24,13 +24,13 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-- name: Install the primary IPA server
+- name: Install the master IPA server
   shell:
     ipa-server-install --unattended
     --realm {{ ipaserver_realm }}
     --domain {{ ipaserver_domain }}
-    -a {{ ipaserver_admin_password }}
-    -p {{ ipaserver_dir_mgmt_password }}
+    -a{{ ipaserver_admin_password }}
+    -p{{ ipaserver_dir_mgmt_password }}
     --hostname={{ inventory_hostname }}
     --ip-address={{ hostvars[inventory_hostname]['ansible_host'] }}
     {{ '--idstart=%s' % ipaserver_idstart if ipaserver_idstart | default(False) else '' }}
@@ -51,11 +51,54 @@
     executable: /bin/bash
     creates: /etc/ipa/default.conf
 
+##### I HAVE NO IDEA WHY THIS IS NECESSARY #####
+
+# Check if ipaserver_keytab exists. If it does, the admin password should not
+# be changed.
+- name: Check for keytab
+  stat: path={{ ipaserver_keytab }}
+  register: ktf
+
+#- name: Stop IPA
+#  service: name=ipa state=stopped
+#  when: ktf.stat.exists == False
+
+#- name: Generate SSHA hash for ipaserver_admin_password
+#  shell:
+#    /usr/bin/pwdhash "{{ ipaserver_admin_password }}"
+#  register: ipaserver_admin_password_hash
+#  when: ktf.stat.exists == False
+
+#- name: Set nsslapd-rootpw to SSHA hash for ipaserver_admin_password
+#  lineinfile: 
+#    dest: /etc/dirsrv/slapd-{{ ipaserver_realm | regex_replace('\.', '-') }}/dse.ldif
+#    regexp: '^nsslapd-rootpw:\s.*' 
+#    line: 'nsslapd-rootpw: {{ ipaserver_admin_password_hash.stdout }}'
+#  when: ktf.stat.exists == False
+
+#- name: Start IPA
+#  service: name=ipa state=started
+#  when: ktf.stat.exists == False
+
+#- name: Wait for Kerberos
+#  wait_for: host={{ inventory_hostname }} port=88 state=present
+#  when: ktf.stat.exists == False
+
+- name: Set LDAP password for admin
+  shell:
+    ldappasswd -ZZ -D 'cn=directory manager' -w{{ ipaserver_dir_mgmt_password }}
+      -s{{ ipaserver_admin_password }}
+      uid=admin,cn=users,cn=accounts,dc=licensing,dc=service,dc=trade,dc=gov,dc=uk,dc=test
+      -H ldap://{{ inventory_hostname }}
+  when: ktf.stat.exists == False
+
+##### NOW I COMPLETELY UNDERSTAND #####
+
 - name: Create a keytab file
   shell:
     echo {{ ipaserver_admin_password }} | kinit admin@{{ ipaserver_realm }} ;
-    ipa-getkeytab -s {{ inventory_hostname }} -p admin@{{ ipaserver_realm }} -k 
-      {{ ipaserver_keytab }}
+    ipa-getkeytab -s {{ inventory_hostname }} -p admin@{{ ipaserver_realm }} 
+      -k {{ ipaserver_keytab }}
   args:
     executable: /bin/bash
     creates: "{{ ipaserver_keytab }}"
@@ -73,55 +116,63 @@
                 not in reverse_result.stderr and 'already exists' not \
                 in reverse_result.stderr"
 
-- name: Create DNS entries for servers
+# The following registers a host, generates a password and registers a fact.
+- name: Create host entries for replica servers
   shell:
     kinit admin -k -t {{ ipaserver_keytab }} ;
-    ip_addr={{ hostvars[item]['ansible_host'] }} ;
-    ipa host-add {{ item }} --random --ip-address ${ip_addr} | grep 
-      "Random password" | awk -F':' '{print$2}' | awk
+    ipa host-add {{ item }} --random --ip-address {{ hostvars[item]['ansible_host'] }}
+      2>/root/replicas-{{ item.split('.')[0] }}.log | grep "Random password" |
+      awk -F':' '{print$2}' | xargs | tee /root/replicas-{{ item.split('.')[0] }}.log
+  args:
+    executable: /bin/bash
+    creates: /root/replicas-{{ item.split('.')[0] }}.log
+  register: replicas
+  with_items:
+    - "{{ groups['beis-mgmt-ipa-replicas'] }}"
+
+- name: debug replicas
+  debug: var=item.item
+  with_items:
+    - "{{ replicas.results }}"
+
+- name: Promote replicas.results.item.stdout as fact
+  set_fact: 
+    "{{ item.item.split('.')[0] ~ '_passwd' }}": "{{ item.stdout.strip() }}"
+  when: "'{{ item.stdout }}' is defined"
+  with_items:
+    - "{{ replicas.results }}"
+
+- name: Output host_passwd fact
+  debug: var={{ hostvars[groups['beis-mgmt-ipa-masters'][0]][item.split('.')[0] ~ '_passwd'] }}
+  when: "'{{ item.stdout }}' is defined"
+  with_items:
+    - "{{ groups['beis-mgmt-ipa-replicas'] }}"
+
+- name: Add replica servers to ipaserver group
+  shell:
+    kinit admin -k -t {{ ipaserver_keytab }} ;
+    ipa hostgroup-add-member ipaservers --hosts {{ item }} 2>&1 | tee 
       /root/replicas-{{ item.split('.')[0] }}.log ;
   args:
     executable: /bin/bash
     creates: /root/replicas-{{ item.split('.')[0] }}.log
-  register: ipa_host_pass_out
-#  when: hostvars[item]['iparole'] == "replica"
   with_items:
-    - "{{ groups['beis-mgmt-ipa'] }}"
-
-- name: Output ipa_host_pass_out
-  debug: var=ipa_host_pass_out.stdout
-  when: ipa_host_pass_out.stdout is defined
-
-- name: Promote ipa_host_pass_out.stdout as fact
-  set_fact: 
-    ipa_host_pass: "{{ ipa_host_pass_out.stdout.strip() }}"
-#  when: hostvars[item]['iparole'] == "replica"
-  with_items:
-    - "{{ groups['beis-mgmt-ipa'] }}"
-  when: ipa_host_pass_out.stdout is defined
-
-- name: Output ipa_host_pass
-  debug: var=ipa_host_pass
-  when: ipa_host_pass is defined
+    - "{{ groups['beis-mgmt-ipa-replicas'] }}"
 
 - name: Add reverse DNS entries
   shell:
     kinit admin -k -t {{ ipaserver_keytab }} ;
     ip_addr={{ hostvars[item]['ansible_host'] }} ;
-    ipa dnsrecord-add 100.100.10.in-addr.arpa. ${ip_addr##*.} --ptr-rec
-      {{ item }}. >> /root/replicas-reverse.log ;
+    ipa dnsrecord-add 100.100.10.in-addr.arpa. ${ip_addr##*.} --ptr-rec {{ item }}. 
+      2>&1 | tee /root/replicas-reverse-{{ item.split('.')[0] }}.log ;
   args:
     executable: /bin/bash
-#    creates: /root/replicas-reverse.log
+    creates: /root/replicas-reverse-{{ item.split('.')[0] }}.log
   register: reverse_entries
-  failed_when: "'no modifications to be performed' not in 
-                reverse_entries.stderr and reverse_entries.rc != 0"
-#  when: hostvars[item]['iparole'] == "replica"
+  failed_when: "'no modifications to be performed' not in reverse_entries.stderr \
+                and reverse_entries.rc != 0"
   with_items:
     - "{{ groups['beis-mgmt-ipa'] }}"
-
-- name: Print reverse_entries
-  debug: var=reverse_entries
 
 - name: Fetch files from primary ipa server
   fetch: src={{ item }} dest=/tmp/{{ item | basename }} flat=yes
