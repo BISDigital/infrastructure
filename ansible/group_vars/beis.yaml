@@ -33,11 +33,14 @@
 # LITE UAT
 #ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q cloud-user@51.179.219.85"'
 
+# InnovateUK
+#ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q cloud-user@51.179.219.63"'
+
 # BEIS Production
-ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q cloud-user@51.179.219.105"'
+#ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q cloud-user@51.179.219.105"'
 
 # Vagrant
-#ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q -p2222 vagrant@127.0.0.1"'
+ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q -p2222 vagrant@127.0.0.1"'
 
 # The first entry is for reference only. By default, a reverse zone is created
 # for the subnet the master is connected to.
