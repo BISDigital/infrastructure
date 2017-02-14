@@ -87,3 +87,18 @@ backend licensing-service-trade-gov-uk-backend
 
 backend letsencrypt-backend
    server letsencrypt 127.0.0.1:54321
+
+frontend licensing-trade-gov-uk-443
+   bind 10.100.1.5:443
+   default_backend licensing-service-trade-gov-uk-backend-443
+   mode tcp
+   log /dev/log local0 debug
+   option tcplog
+   option socket-stats
+
+backend licensing-service-trade-gov-uk-backend-443
+   balance source
+   mode tcp
+   server      m0 10.100.1.21:443 check
+   server      m1 10.100.1.22:443 check
+   server      m2 10.100.1.23:443 check
