@@ -49,6 +49,11 @@
   tags:
     - volumes
 
+# Create server groups for anti-affinity 
+- include: server_groups.yaml
+  tags:
+    - server_groups
+
 # Create instances homed to specific subnets with attached security groups
 - include: instances.yaml
   tags:
