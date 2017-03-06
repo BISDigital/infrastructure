@@ -24,23 +24,59 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-- name: Create instance volumes
-  os_volume:
-    display_name: "{{ item }}"
-    size: 60
+- name: Create the external DNS server group
+  os_server_group:
     state: present
-  with_items:
-    - alb01
-    - alb02
-    - aom01
-    - aom02
-    - aom03
-    - aon01
-    - aon02
-    - slb01
-    - slb02
-    - som01
-    - som02
-    - som03
-    - son01
-    - son02
+    name: external_dns
+    policies:
+      - anti-affinity
+
+- name: Create the internal services server group
+  os_server_group:
+    state: present
+    name: internal_services
+    policies:
+      - anti-affinity
+
+- name: Create the OpenShift app master server group
+  os_server_group:
+    state: present
+    name: app_openshift_master
+    policies:
+      - anti-affinity
+
+- name: Create the OpenShift app node server group
+  os_server_group:
+    state: present
+    name: app_openshift_node
+    policies:
+      - anti-affinity
+
+- name: Create the app load balancer server group
+  os_server_group:
+    state: present
+    name: app_loadbalancer_nodes
+    policies:
+      - anti-affinity
+
+- name: Create the OpenShift svc master server group
+  os_server_group:
+    state: present
+    name: svc_openshift_master
+    policies:
+      - anti-affinity
+
+- name: Create the OpenShift svc node server group
+  os_server_group:
+    state: present
+    name: svc_openshift_node
+    policies:
+      - anti-affinity
+
+- name: Create the svc load balancer server group
+  os_server_group:
+    state: present
+    name: svc_loadbalancer_nodes
+    policies:
+      - anti-affinity
+
