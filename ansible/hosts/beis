@@ -37,18 +37,24 @@ ukbeisipa02.licensing.service.trade.gov.uk.test ansible_host=10.100.100.12 iparo
 
 [beis-mgmt-openshift]
 ukbeismom01.licensing.service.trade.gov.uk.test ansible_host=10.100.100.21
-ukbeismon01.licensing.service.trade.gov.uk.test ansible_host=10.100.100.22
-ukbeismon02.licensing.service.trade.gov.uk.test ansible_host=10.100.100.23
+ukbeismom02.licensing.service.trade.gov.uk.test ansible_host=10.100.100.22
+ukbeismom03.licensing.service.trade.gov.uk.test ansible_host=10.100.100.23
+ukbeismon01.licensing.service.trade.gov.uk.test ansible_host=10.100.100.51
+ukbeismon02.licensing.service.trade.gov.uk.test ansible_host=10.100.100.52
 
 [beis-app-openshift]
 ukbeisaom01.licensing.service.trade.gov.uk.test ansible_host=10.100.1.21
-ukbeisaon01.licensing.service.trade.gov.uk.test ansible_host=10.100.1.22
-ukbeisaon02.licensing.service.trade.gov.uk.test ansible_host=10.100.1.23
+ukbeisaom02.licensing.service.trade.gov.uk.test ansible_host=10.100.1.22
+ukbeisaom03.licensing.service.trade.gov.uk.test ansible_host=10.100.1.23
+ukbeisaon01.licensing.service.trade.gov.uk.test ansible_host=10.100.1.51
+ukbeisaon02.licensing.service.trade.gov.uk.test ansible_host=10.100.1.52
 
 [beis-svc-openshift]
 ukbeissom01.licensing.service.trade.gov.uk.test ansible_host=10.100.20.21
-ukbeisson01.licensing.service.trade.gov.uk.test ansible_host=10.100.20.22
-ukbeisson02.licensing.service.trade.gov.uk.test ansible_host=10.100.20.23
+ukbeissom02.licensing.service.trade.gov.uk.test ansible_host=10.100.20.22
+ukbeissom03.licensing.service.trade.gov.uk.test ansible_host=10.100.20.23
+ukbeisson01.licensing.service.trade.gov.uk.test ansible_host=10.100.20.51
+ukbeisson02.licensing.service.trade.gov.uk.test ansible_host=10.100.20.52
 
 [beis:children]
 beis-ras

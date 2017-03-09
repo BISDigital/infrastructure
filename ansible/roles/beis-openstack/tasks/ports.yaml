@@ -74,6 +74,32 @@
       - ipa_server
       - remote_repositories
 
+- name: Create a port for the mgmt OpenShift master
+  os_port:
+    state: present
+    name: mgmtport2{{ item }}
+    network: mgmt
+    fixed_ips:
+      - ip_address: 10.100.100.2{{ item }}
+    security_groups:
+      - mgmt_nodes
+      - remote_repositories
+      - mgmt_openshift_master
+  with_sequence: count=3
+
+- name: Create a port for the app OpenShift nodes
+  os_port:
+    state: present
+    name: mgmtport5{{ item }}
+    network: mgmt
+    fixed_ips:
+      - ip_address: 10.100.100.5{{item }}
+    security_groups:
+      - mgmt_nodes
+      - remote_repositories
+      - mgmt_openshift_node
+  with_sequence: count=2
+
 # Load Balancer (HAProxy) ports
 - name: Create app load balancer ports 
   os_port:

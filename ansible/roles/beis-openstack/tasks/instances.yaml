@@ -208,22 +208,10 @@
 - name: Create mgmt OpenShift master instances
   os_server:
     name: "{{ item.name }}"
-    image: rhel-7-CURRENT
-    flavor: m1.small
-    key_name: justin_cook
-    timeout: 200
-    auto_ip: no
-    nics:
-      - port-name: mgmtport2{{ item.count }}
-    meta:
-      hostname: "{{ item.name }}"
-  with_items:
-    - { name: 'ukbeismom01.{{ role_fqdn }}', count: 1 }
-
-- name: Create mgmt OpenShift node instances
-  os_server:
-    name: "{{ item.name }}"
-    image: rhel-7-CURRENT
+    availability_zone: "{{ item.az }}"
+#    image: rhel-7-CURRENT
+#    boot_from_volume: yes
+    boot_volume: "{{ item.vol }}"
     flavor: m1.medium
     key_name: justin_cook
     timeout: 200
@@ -233,6 +221,26 @@
     meta:
       hostname: "{{ item.name }}"
   with_items:
-    - { name: 'ukbeismon01.{{ role_fqdn }}', count: 2 }
-    - { name: 'ukbeismon02.{{ role_fqdn }}', count: 3 }
+    - { name: 'ukbeismom01.{{ role_fqdn }}', vol: "mom01", az: "0000c-1", count: 1 }
+    - { name: 'ukbeismom02.{{ role_fqdn }}', vol: "mom02", az: "0000c-2", count: 2 }
+    - { name: 'ukbeismom03.{{ role_fqdn }}', vol: "mom03", az: "0000c-1", count: 3 }
+
+- name: Create mgmt OpenShift node instances
+  os_server:
+    name: "{{ item.name }}"
+    availability_zone: "{{ item.az }}"
+    image: rhel-7-CURRENT
+    boot_from_volume: yes
+#    boot_volume: "{{ item.vol }}"
+    flavor: m1.medium
+    key_name: justin_cook
+    timeout: 200
+    auto_ip: no
+    nics:
+      - port-name: mgmtport5{{ item.count }}
+    meta:
+      hostname: "{{ item.name }}"
+  with_items:
+    - { name: 'ukbeismon01.{{ role_fqdn }}', vol: "mon01", az: "0000c-1", count: 1 }
+    - { name: 'ukbeismon02.{{ role_fqdn }}', vol: "mon02", az: "0000c-2", count: 2 }
 
