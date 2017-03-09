@@ -24,36 +24,4 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-- hosts: beis-ns
-  vars:
-    domains:
-      - name: licensing-qa.service.trade.gov.uk
-        ns1: ns1.licensing-qa.service.trade.gov.uk
-        ns1ip: 51.179.219.70
-        ns2: ns2.licensing-qa.service.trade.gov.uk
-        ns2ip: 51.179.219.75
-        records:
-          - name: ukbeisep01
-            type: A
-            content: 51.179.219.69
-          - name: ukbeisalb
-            type: A
-            content: 51.179.219.6
-          - name: www
-            type: CNAME
-            content: ukbeisalb.licensing-qa.service.trade.gov.uk.
-          - name: permissions-finder
-            type: CNAME
-            content: ukbeisalb.licensing-qa.service.trade.gov.uk.
-          - name: ogel-registration
-            type: CNAME
-            content: ukbeisalb.licensing-qa.service.trade.gov.uk.
-          - name: beis-bot
-            type: CNAME
-            content: ukbeisalb.licensing-qa.service.trade.gov.uk.
-          - name: chatbot
-            type: CNAME
-            content: ukbeisalb.licensing-qa.service.trade.gov.uk.
-  roles: 
-    - powerdns
-  become: yes
+role_fqdn: licensing.service.trade.gov.uk.test
