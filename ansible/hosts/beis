@@ -35,6 +35,10 @@ ukbeisns02.licensing.service.trade.gov.uk.test ansible_host=10.100.254.22 dnsrol
 ukbeisipa01.licensing.service.trade.gov.uk.test ansible_host=10.100.100.11 iparole=primary
 ukbeisipa02.licensing.service.trade.gov.uk.test ansible_host=10.100.100.12 iparole=replica
 
+[beis-mgmt-mtr]
+ukbeismtr01.licensing.service.trade.gov.uk.test ansible_host=10.100.100.15
+ukbeismtr02.licensing.service.trade.gov.uk.test ansible_host=10.100.100.16
+
 [beis-mgmt-openshift]
 ukbeismom01.licensing.service.trade.gov.uk.test ansible_host=10.100.100.21
 ukbeismom02.licensing.service.trade.gov.uk.test ansible_host=10.100.100.22
@@ -60,6 +64,7 @@ ukbeisson02.licensing.service.trade.gov.uk.test ansible_host=10.100.20.52
 beis-ras
 beis-ns
 beis-mgmt-ipa
+beis-mgmt-mtr
 beis-mgmt-openshift
 beis-app-openshift
 beis-svc-openshift

@@ -24,6 +24,13 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+- name: Create the monitoring server group
+  os_server_group:
+    state: present
+    name: internal_monitoring
+    policies:
+      - anti-affinity
+
 - name: Create the external DNS server group
   os_server_group:
     state: present

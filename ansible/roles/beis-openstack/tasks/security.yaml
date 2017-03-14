@@ -146,6 +146,33 @@
   with_items:
   - 10.100.254.0/24
 
+#### Monitoring Servers #####
+
+- name: Create the internal_monitoring security group
+  os_security_group: 
+    name=internal_monitoring
+    description="Internal monitoring access"
+
+- name: Remove default egress allowed from internal_monitoring group
+  os_security_group_rule:
+    state: absent
+    security_group: internal_monitoring
+    ethertype: "{{ item }}"
+    direction: egress
+  with_items:
+  - IPv4
+  - IPv6
+
+- name: Allow internal_monitoring tcp from internal_monitoring group
+  os_security_group_rule:
+    security_group: internal_monitoring
+    protocol: tcp
+    port_range_min: "{{ item }}"
+    port_range_max: "{{ item }}"
+    direction: egress
+  with_items:
+    - 22
+
 ##### IPA Servers #####
 
 - name: Create ipa_server security group

@@ -30,6 +30,10 @@
     size: 60
     state: present
   with_items:
+    - ipa01
+    - ipa02
+    - mtr01
+    - mtr02
     - alb01
     - alb02
     - aom01
@@ -44,3 +48,8 @@
     - som03
     - son01
     - son02
+    - mom01
+    - mom02
+    - mom03
+    - mon01
+    - mon02
