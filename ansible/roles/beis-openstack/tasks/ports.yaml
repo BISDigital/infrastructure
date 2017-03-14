@@ -50,29 +50,31 @@
   with_sequence: start=1 count=2
 
 # MGMT ports
-- name: Create a port for the first IPA server
+- name: Create ports for the IPA servers
   os_port:
     state: present
-    name: mgmtport11
+    name: mgmtport1{{ item }}
     network: mgmt
     fixed_ips:
-      - ip_address: 10.100.100.11
+      - ip_address: 10.100.100.1{{ item }}
     security_groups:
       - mgmt_nodes
       - ipa_server
       - remote_repositories
+  with_sequence: count=2
 
-- name: Create a port for the second IPA server
+- name: Create ports for the monitoring servers
   os_port:
     state: present
-    name: mgmtport12
+    name: mgmtport1{{ item }}
     network: mgmt
     fixed_ips:
-      - ip_address: 10.100.100.12
+      - ip_address: 10.100.100.1{{ item }}
     security_groups:
       - mgmt_nodes
-      - ipa_server
+      - internal_monitoring
       - remote_repositories
+  with_sequence: start=5 count=2
 
 # Load Balancer (HAProxy) ports
 - name: Create app load balancer ports 

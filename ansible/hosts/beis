@@ -45,6 +45,10 @@ beis-mgmt-ipa-replicas
 ukbeisalb01.licensing.service.trade.gov.uk.test ansible_host=10.100.1.5
 ukbeisalb02.licensing.service.trade.gov.uk.test ansible_host=10.100.1.6
 
+[beis-mgmt-mtr]
+ukbeismtr01.licensing.service.trade.gov.uk.test ansible_host=10.100.100.15
+ukbeismtr02.licensing.service.trade.gov.uk.test ansible_host=10.100.100.16
+
 [beis-app-openshift]
 ukbeisaom01.licensing.service.trade.gov.uk.test ansible_host=10.100.1.21
 ukbeisaom02.licensing.service.trade.gov.uk.test ansible_host=10.100.1.22
@@ -67,6 +71,7 @@ ukbeisson02.licensing.service.trade.gov.uk.test ansible_host=10.100.20.52
 beis-ras
 beis-ns
 beis-mgmt-ipa
+beis-mgmt-mtr
 beis-app
 beis-app-openshift
 beis-svc
