@@ -1,7 +1,0 @@
-require 'vagrant-dotvm'
-
-Vagrant.configure(2) do |config|
-  config.ssh.insert_key = false
-  dotvm = VagrantPlugins::Dotvm::Dotvm.new __dir__
-  dotvm.inject(config)
-end
