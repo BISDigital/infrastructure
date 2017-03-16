@@ -90,6 +90,7 @@
       - mgmt_nodes
     nics:
       - port-name: mgmtport1{{ item.count }}
+      - port-name: mtrport1{{ item.count }}
     meta:
       hostname: "{{ item.name }}"
       group: internal_monitoring

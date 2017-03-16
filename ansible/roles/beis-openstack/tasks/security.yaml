@@ -62,7 +62,6 @@
   - 193.240.0.0/16
   - 94.118.0.0/16
   - 94.119.0.0/16
-  - 80.235.133.135/32
 
 - name: Allow vpn tcp:1194 ingress to 0.0.0.0/0
   os_security_group_rule:
@@ -99,7 +98,6 @@
   with_items:
   - 193.240.0.0/16
   - 94.118.0.0/16
-  - 80.235.133.135/32
 
 ##### Remote Repositories #####
 
@@ -170,6 +168,42 @@
     port_range_min: "{{ item }}"
     port_range_max: "{{ item }}"
     direction: egress
+  with_items:
+    - 22
+
+- name: Create the private_monitoring security group
+  os_security_group:
+    name=private_monitoring
+    description="Private monitoring communication"
+
+- name: Remove default egress allowed from private_monitoring group
+  os_security_group_rule:
+    state: absent
+    security_group: private_monitoring
+    ethertype: "{{ item }}"
+    direction: egress
+  with_items:
+  - IPv4
+  - IPv6
+
+- name: Allow egress to private network
+  os_security_group_rule:
+    state: present
+    security_group: private_monitoring
+    ethertype: "{{ item }}"
+    remote_ip_prefix: 172.17.1.0/24
+    direction: egress
+  with_items:
+  - IPv4
+
+- name: Allow private_monitoring tcp
+  os_security_group_rule:
+    security_group: private_monitoring
+    protocol: tcp
+    remote_ip_prefix: 172.17.1.0/24
+    port_range_min: "{{ item }}"
+    port_range_max: "{{ item }}"
+    direction: ingress
   with_items:
     - 22
 
