@@ -87,6 +87,17 @@
       - private_monitoring
   with_sequence: start=5 count=2
 
+- name: Create private network ports for the monitoring servers
+  os_port:
+    state: present
+    name: mtrport1{{ item }}
+    network: mtr
+    fixed_ips:
+      - ip_address: 172.17.1.1{{ item }}
+    security_groups:
+      - private_monitoring
+  with_sequence: start=5 count=2
+
 # Load Balancer (HAProxy) ports
 - name: Create app load balancer ports 
   os_port:
