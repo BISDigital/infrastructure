@@ -32,6 +32,10 @@
   os_network:
     name: mgmt
 
+- name: Create mtr network
+  os_network:
+    name: mtr
+
 - name: Create svc network
   os_network: 
     name: svc
@@ -71,6 +75,13 @@
     dns_nameservers:
     - 8.8.8.8
     - 8.8.4.4
+  ignore_errors: yes
+
+- name: Create mtr1subnet
+  os_subnet:
+    network_name: mtr
+    name: mtr1subnet
+    cidr: 172.17.1.0/24
   ignore_errors: yes
 
 - name: Create svc1subnet
