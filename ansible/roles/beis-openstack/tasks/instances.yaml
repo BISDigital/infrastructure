@@ -78,8 +78,8 @@
   os_server:
     name: '{{ item.name }}'
     availability_zone: '{{ item.az }}'
-#    image: rhel-7-CURRENT
-    boot_volume: "{{ item.vol }}"
+    image: rhel-7-CURRENT
+    boot_from_volume: "{{ item.vol }}"
     flavor: m1.medium
     key_name: justin_cook
     timeout: 200
@@ -101,8 +101,8 @@
 - name: Create IPA servers
   os_server:
     name: "{{ item.name }}"
-#    image: rhel-7-CURRENT
-    boot_volume: "{{ item.vol }}"
+    image: rhel-7-CURRENT
+    boot_from_volume: "{{ item.vol }}"
     flavor: t1.medium
     key_name: justin_cook
     timeout: 200
@@ -124,6 +124,7 @@
   os_server:
     name: "{{ item.name }}"
     image: rhel-7-CURRENT
+    boot_from_vol: "{{ item.vol }}"
     flavor: m1.small
     key_name: justin_cook
     timeout: 200
@@ -134,14 +135,15 @@
       hostname: "{{ item.name }}"
       group: app_openshift_master
   with_items:
-    - { name: 'ukbeisaom01.{{ role_fqdn }}', count: 1 }
-    - { name: 'ukbeisaom02.{{ role_fqdn }}', count: 2 }
-    - { name: 'ukbeisaom03.{{ role_fqdn }}', count: 3 }
+    - { name: 'ukbeisaom01.{{ role_fqdn }}', az: "0000c-1", vol: "aom01", count: 1 }
+    - { name: 'ukbeisaom02.{{ role_fqdn }}', az: "0000c-2", vol: "aom02", count: 2 }
+    - { name: 'ukbeisaom03.{{ role_fqdn }}', az: "0000c-1", vol: "aom03", count: 3 }
 
 - name: Create app OpenShift node instances
   os_server:
     name: "{{ item.name }}"
     image: rhel-7-CURRENT
+    boot_from_vol: "{{ item.vol }}"
     flavor: m1.medium
     key_name: justin_cook
     timeout: 200
@@ -152,13 +154,14 @@
       hostname: "{{ item.name }}"
       group: app_openshift_node
   with_items:
-    - { name: 'ukbeisaon01.{{ role_fqdn }}', count: 1 }
-    - { name: 'ukbeisaon02.{{ role_fqdn }}', count: 2 }
+    - { name: 'ukbeisaon01.{{ role_fqdn }}', az: "0000c-1", vol: "aon01", count: 1 }
+    - { name: 'ukbeisaon02.{{ role_fqdn }}', az: "0000c-2", vol: "aon02",count: 2 }
 
 - name: Create app haproxy instances
   os_server:
     name: "{{ item.name }}"
     image: rhel-7-CURRENT
+    boot_from_vol: "{{ item.vol }}"
     flavor: m1.small
     key_name: justin_cook
     timeout: 200
@@ -169,13 +172,14 @@
       hostname: "{{ item.name }}"
       group: app_loadbalancer_nodes
   with_items:
-    - { name: 'ukbeisalb01.{{ role_fqdn }}', count: 5 }
-    - { name: 'ukbeisalb02.{{ role_fqdn }}', count: 6 }
+    - { name: 'ukbeisalb01.{{ role_fqdn }}', az: "0000c-1", vol: "alb01", count: 5 }
+    - { name: 'ukbeisalb02.{{ role_fqdn }}', az: "0000c-2", vol: "alb02", count: 6 }
 
 - name: Create svc OpenShift master instances
   os_server:
     name: "{{ item.name }}"
     image: rhel-7-CURRENT
+    boot_from_vol: "{{ item.vol }}"
     flavor: m1.small
     key_name: justin_cook
     timeout: 200
@@ -186,14 +190,15 @@
       hostname: "{{ item.name }}"
       group: svc_openshift_master
   with_items:
-    - { name: 'ukbeissom01.{{ role_fqdn }}', count: 1 }
-    - { name: 'ukbeissom02.{{ role_fqdn }}', count: 2 }
-    - { name: 'ukbeissom03.{{ role_fqdn }}', count: 3 }
+    - { name: 'ukbeissom01.{{ role_fqdn }}', az: "0000c-1", vol: "som01", count: 1 }
+    - { name: 'ukbeissom02.{{ role_fqdn }}', az: "0000c-2", vol: "som02", count: 2 }
+    - { name: 'ukbeissom03.{{ role_fqdn }}', az: "0000c-1", vol: "som03", count: 3 }
 
 - name: Create svc OpenShift node instances
   os_server:
     name: "{{ item.name }}"
     image: rhel-7-CURRENT
+    boot_from_vol: "{{ item.vol }}"
     flavor: m1.medium
     key_name: justin_cook
     timeout: 200
@@ -204,13 +209,14 @@
       hostname: "{{ item.name }}"
       group: svc_openshift_node
   with_items:
-    - { name: 'ukbeisson01.{{ role_fqdn }}', count: 1 }
-    - { name: 'ukbeisson02.{{ role_fqdn }}', count: 2 }
+    - { name: 'ukbeisson01.{{ role_fqdn }}', az: "0000c-1", vol: "son01", count: 1 }
+    - { name: 'ukbeisson02.{{ role_fqdn }}', az: "0000c-2", vol: "son02", count: 2 }
 
 - name: Create svc haproxy instances
   os_server:
     name: "{{ item.name }}"
     image: rhel-7-CURRENT
+    boot_from_vol: "{{ item.vol }}"
     flavor: m1.small
     key_name: justin_cook
     timeout: 200
@@ -221,5 +227,5 @@
       hostname: "{{ item.name }}"
       group: svc_loadbalancer_nodes
   with_items:
-    - { name: 'ukbeisslb01.{{ role_fqdn }}', count: 5 }
-    - { name: 'ukbeisslb02.{{ role_fqdn }}', count: 6 }
+    - { name: 'ukbeisslb01.{{ role_fqdn }}', az: "0000c-1", vol: "slb01", count: 5 }
+    - { name: 'ukbeisslb02.{{ role_fqdn }}', az: "0000c-2", vol: "slb02", count: 6 }
