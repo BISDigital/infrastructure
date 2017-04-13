@@ -54,6 +54,9 @@
           - name: chatbot
             type: CNAME
             content: ukbeisalb.licensing-qa.service.trade.gov.uk.
+          - name: admin-prototype
+            type: CNAME
+            content: ukbeisalb.licensing-qa.service.trade.gov.uk.
   roles: 
     - powerdns
   become: yes
