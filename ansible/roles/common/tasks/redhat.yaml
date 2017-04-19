@@ -67,18 +67,13 @@
   lineinfile: dest=/etc/NetworkManager/NetworkManager.conf regexp="^dns="
               insertafter='^\[main\]$' line="dns=none" state=present
 
-- name: Set PEERDNS to no on eth0
-  lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-eth0 
-              regexp='^PEERDNS=("?)yes("?)' line='PEERDNS=\1no\2' 
-              backrefs=yes
-
 - name: Restrict ciphers in sshd
   lineinfile: dest=/etc/ssh/sshd_config
               regexp='^Ciphers\ .*'
               line="Ciphers aes128-ctr,aes192-ctr,aes256-ctr,arcfour256,arcfour128,arcfour"
               insertafter='^#RekeyLimit\ .*' state=present
 
-- name: Restrict MAC algoritms for sshd
+- name: Restrict MAC algorithms for sshd
   lineinfile: dest=/etc/ssh/sshd_config
               regexp='^MACs\ .*' line="MACs hmac-sha1,hmac-ripemd160"
               insertafter='^Ciphers\ .*' state=present

@@ -36,3 +36,11 @@
     - ipaserver
   become: yes
 
+- hosts: all
+  tasks:
+  - name: Set PEERDNS to no on eth0
+    lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-eth0
+                regexp='^PEERDNS=("?)yes("?)' line='PEERDNS=\1no\2'
+                backrefs=yes
+  become: yes
+
