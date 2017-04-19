@@ -57,6 +57,9 @@
           - name: admin-prototype
             type: CNAME
             content: ukbeisalb.licensing-qa.service.trade.gov.uk.
+          - name: licence-application
+            type: CNAME
+            content: ukbeisalb.licensing-qa.service.trade.gov.uk.
   roles: 
     - powerdns
   become: yes
