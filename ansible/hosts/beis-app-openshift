@@ -46,7 +46,7 @@ openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 
 [masters]
 ukbeisaom01.licensing.service.trade.gov.uk.test openshift_hostname=ukbeisaom01.licensing.service.trade.gov.uk.test openshift_public_hostname=ukbeisaom01.licensing.service.trade.gov.uk.test ansible_host=10.100.1.21
 ukbeisaom02.licensing.service.trade.gov.uk.test openshift_hostname=ukbeisaom02.licensing.service.trade.gov.uk.test openshift_public_hostname=ukbeisaom02.licensing.service.trade.gov.uk.test ansible_host=10.100.1.22
-ukbeisaom03.licensing.service.trade.gov.uk.test openshift_hostname=ukbeisaom02.licensing.service.trade.gov.uk.test openshift_public_hostname=ukbeisaom03.licensing.service.trade.gov.uk.test ansible_host=10.100.1.23
+ukbeisaom03.licensing.service.trade.gov.uk.test openshift_hostname=ukbeisaom03.licensing.service.trade.gov.uk.test openshift_public_hostname=ukbeisaom03.licensing.service.trade.gov.uk.test ansible_host=10.100.1.23
 
 [etcd]
 ukbeisaom01.licensing.service.trade.gov.uk.test ansible_host=10.100.1.21
