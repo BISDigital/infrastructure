@@ -25,9 +25,9 @@ RUN curl -o /etc/yum.repos.d/bintray-sbt-rpm.repo https://bintray.com/sbt/rpm/rp
     sed -i 's/mapfile\ .*//' /root/.sdkman/src/sdkman-path-helpers.sh && \
     source /root/.sdkman/bin/sdkman-init.sh && \
     echo -ne '\n' | sdk install gradle 3.0 && \
-    curl -v -j -k -L -o jdk-8u112-linux-x64.rpm \
+    curl -v -j -k -L -o jdk-8u131-linux-x64.rpm \
     -H "Cookie: oraclelicense=accept-securebackup-cookie" \
-    http://download.oracle.com/otn-pub/java/jdk/8u131-b11/jdk-8u131-linux-x64.rpm && \
+    http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm && \
     rpm -ivh jdk-8u131-linux-x64.rpm && \
     rm -f /etc/alternatives/java && \
     ln -s /usr/java/jdk1.8.0_131/bin/java /etc/alternatives/java && \
