@@ -207,6 +207,36 @@
   with_items:
     - 22
 
+#### Logging Servers #####
+
+- name: Create the internal_logging security group
+  os_security_group:
+    name=internal_logging
+    description="Internal logging access"
+
+- name: Remove default egress allowed from internal_logging group
+  os_security_group_rule:
+    state: absent
+    security_group: internal_logging
+    ethertype: "{{ item }}"
+    direction: egress
+  with_items:
+  - IPv4
+  - IPv6
+
+- name: Allow internal_logging tcp
+  os_security_group_rule:
+    security_group: internal_logging
+    protocol: tcp
+    remote_ip_prefix: 10.100.0.0/16
+    port_range_min: "{{ item }}"
+    port_range_max: "{{ item }}"
+    direction: ingress
+  with_items:
+    - 5601
+    - 9200
+    - 9300
+
 ##### IPA Servers #####
 
 - name: Create ipa_server security group
