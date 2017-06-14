@@ -70,10 +70,16 @@
   - name: Manually update /etc/resolv.conf to use internal DNS
     copy:
       src=files/resolv.conf dest=/etc/resolv.conf
+  - name: Setup iptables config
+    copy:
+      src=files/iptables dest=/etc/sysconfig/iptables
+    register: iptables
+  - name: Restart iptables
+    service: name=iptables state=restarted
+    when: iptables.changed
 
-- include: ../../../openshift-ansible/playbooks/common/openshift-cluster/config.yml
+- include: ../../../openshift-ansible/playbooks/byo/config.yml
   vars:
-    openshift_release: 3.3
     g_etcd_hosts:   "{{ groups.etcd | default([]) }}"
     g_lb_hosts:     "{{ groups.lb | default([]) }}"
     g_master_hosts: "{{ groups.masters | default([]) }}"
