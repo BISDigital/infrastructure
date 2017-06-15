@@ -22,11 +22,11 @@ parameters:
 - description: Git repository with Dockerfile and slave entrypoint.
   displayName: Repository URL
   name: SLAVE_REPO_URL
-  value: https://github.com/BISDigital/infrastructure.git
+  value: https://github.com/uktrade/infrastructure.git
 - description: The sub-directory inside the repository.
   displayName: Context Directory
   name: SLAVE_REPO_CONTEXTDIR
-  value: jenkins/slave
+  value: docker/jenkins/slave
 - description: The git ref or tag to use for customization.
   displayName: Git Reference
   name: SLAVE_REPO_REF

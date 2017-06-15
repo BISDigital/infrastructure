@@ -9,12 +9,12 @@ metadata:
     description: Creates a Jenkins master using S2I for installing plugins and configuring Jenkins
     iconClass: icon-jenkins
     tags: instant-app,jenkins
-  name: jenkins-master-s2i
+  name: jenkins-master
 parameters:
 - description: Git source URI for Jenkins S2I
   name: SOURCE_REPOSITORY_URL
   required: true
-  value: https://github.com/BISDigital/infrastructure.git
+  value: https://github.com/uktrade/infrastructure.git
 - description: Git branch/tag reference
   name: SOURCE_REPOSITORY_REF
   value: master
@@ -24,7 +24,7 @@ parameters:
 - description: Maximum amount of memory the container can use.
   displayName: Memory Limit
   name: MEMORY_LIMIT
-  value: 2Gi
+  value: 8Gi
 - description: Password for the Jenkins user.
   displayName: Jenkins Password
   generate: expression
