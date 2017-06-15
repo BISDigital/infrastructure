@@ -1,8 +1,7 @@
-# BISDigital Infrastructure
+# UK Trade Infrastructure
 
-Thank you for visiting the BIS Digital Infrastructure repository. We are in
-very early phases of establishing our technical strategy, but have decided to
-commit to an early release procedure. 
+Thank you for visiting the UK Trade Digital Infrastructure repository. We have
+the intention of being 100% containerised -- and that is across all services.
 
 We have carefully selected the technology based on current trends in
 infrastructure, and those are:
@@ -15,12 +14,14 @@ infrastructure, and those are:
 Each project has its own implementations in the technology and is documented
 accordingly. Please refer to the documentation embedded herein. 
 
-The platform of choice is RHEL7. 
+The platform of choice is RHEL7 and OpenShift Container Platform.
 
 ## vagrant
 
 Vagrant is the first tier of development. This directory is the home of vagrant
 implementations. Each directory within is specific to each project.
+
+Please see https://github.com/uktrade/vagrant repository for more detail.
 
 ## ansible
 
