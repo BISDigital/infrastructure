@@ -24,12 +24,12 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-- hosts: ukbeis[as]om01.licensing.service.trade.gov.uk.test
+- hosts: uktrade[as]om01.licensing.service.trade.gov.uk.test
   vars:
     clusters:
-      ukbeissom01.licensing.service.trade.gov.uk.test:
+      uktradesom01.licensing.service.trade.gov.uk.test:
         name: svc
-        primary_master: ukbeissom01.licensing.service.trade.gov.uk.test
+        primary_master: uktradesom01.licensing.service.trade.gov.uk.test
         project_user: admin
         project_name: lite
         project_sa: lite-push
@@ -55,9 +55,9 @@
             format: xfs
             device: /dev/vdc
             export: 10.100.20.0/24(rw,async,all_squash)
-      ukbeisaom01.licensing.service.trade.gov.uk.test:
+      uktradeaom01.licensing.service.trade.gov.uk.test:
         name: app
-        primary_master: ukbeisaom01.licensing.service.trade.gov.uk.test
+        primary_master: uktradeaom01.licensing.service.trade.gov.uk.test
         project_user: admin
         project_name: lite
         project_sa: lite-push
@@ -72,7 +72,7 @@
     - lite
   become: yes
 
-- hosts: beis-svc-openshift:beis-app-openshift
+- hosts: uktrade-svc-openshift:uktrade-app-openshift
   tasks:
     - name: Configure SELinux to allow containers read/write over NFS
       command: setsebool -P virt_use_nfs=true

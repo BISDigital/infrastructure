@@ -33,12 +33,12 @@
 - name: Install the IPA client
   shell:
     ipa-client-install --force-ntpd --enable-dns-updates --mkhomedir
-      --password {{ hostvars[groups['beis-mgmt-ipa-masters'][0]][inventory_hostname.split('.')[0] ~ '_passwd'] }} 
+      --password {{ hostvars[groups['uktrade-mgmt-ipa-masters'][0]][inventory_hostname.split('.')[0] ~ '_passwd'] }} 
       --unattended
   args:
     executable: /bin/bash
     creates: /etc/ipa/default.conf
-  when: "'{{ hostvars[groups['beis-mgmt-ipa-masters'][0]][inventory_hostname.split('.')[0] ~ '_passwd'] }}' is defined"
+  when: "'{{ hostvars[groups['uktrade-mgmt-ipa-masters'][0]][inventory_hostname.split('.')[0] ~ '_passwd'] }}' is defined"
 
 - name: Check if this is a replica
   shell:

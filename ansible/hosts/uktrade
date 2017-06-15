@@ -1,0 +1,81 @@
+---
+# Copyright (c) 2016, Department for Business, Energy & Industrial Strategy
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of the <organization> nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL BIS BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+[uktrade-ras]
+uktradeep01.licensing.service.trade.gov.uk.test ansible_host=10.100.254.11
+
+[uktrade-ns]
+uktradens01.licensing.service.trade.gov.uk.test ansible_host=10.100.254.21 dnsrole=master
+uktradens02.licensing.service.trade.gov.uk.test ansible_host=10.100.254.22 dnsrole=slave
+
+[uktrade-mgmt-ipa-masters]
+uktradeipa01.licensing.service.trade.gov.uk.test ansible_host=10.100.100.11 iparole=master
+
+[uktrade-mgmt-ipa-replicas]
+uktradeipa02.licensing.service.trade.gov.uk.test ansible_host=10.100.100.12 iparole=replica
+
+[uktrade-mgmt-ipa:children]
+uktrade-mgmt-ipa-masters
+uktrade-mgmt-ipa-replicas
+
+[uktrade-app]
+uktradealb01.licensing.service.trade.gov.uk.test ansible_host=10.100.1.5
+uktradealb02.licensing.service.trade.gov.uk.test ansible_host=10.100.1.6
+
+[uktrade-mgmt-mtr]
+uktrademtr01.licensing.service.trade.gov.uk.test ansible_host=10.100.100.15
+uktrademtr02.licensing.service.trade.gov.uk.test ansible_host=10.100.100.16
+
+[uktrade-app-openshift]
+uktradeaom01.licensing.service.trade.gov.uk.test ansible_host=10.100.1.21
+uktradeaom02.licensing.service.trade.gov.uk.test ansible_host=10.100.1.22
+uktradeaom03.licensing.service.trade.gov.uk.test ansible_host=10.100.1.23
+uktradeaon01.licensing.service.trade.gov.uk.test ansible_host=10.100.1.51
+uktradeaon02.licensing.service.trade.gov.uk.test ansible_host=10.100.1.52
+
+[uktrade-svc]
+uktradeslb01.licensing.service.trade.gov.uk.test ansible_host=10.100.20.5
+uktradeslb02.licensing.service.trade.gov.uk.test ansible_host=10.100.20.6
+
+[uktrade-svc-openshift]
+uktradesom01.licensing.service.trade.gov.uk.test ansible_host=10.100.20.21
+uktradesom02.licensing.service.trade.gov.uk.test ansible_host=10.100.20.22
+uktradesom03.licensing.service.trade.gov.uk.test ansible_host=10.100.20.23
+uktradeson01.licensing.service.trade.gov.uk.test ansible_host=10.100.20.51
+uktradeson02.licensing.service.trade.gov.uk.test ansible_host=10.100.20.52
+
+[uktrade:children]
+uktrade-ras
+uktrade-ns
+uktrade-mgmt-ipa
+uktrade-mgmt-mtr
+uktrade-app
+uktrade-app-openshift
+uktrade-svc
+uktrade-svc-openshift
+
+[uktrade:vars]
+ansible_become=true

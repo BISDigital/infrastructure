@@ -24,18 +24,18 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-- hosts: beis-svc
+- hosts: uktrade-svc
   vars_prompt:
     - name: "auth_pass"
       prompt: "Enter vrrp pass"
       private: yes
   vars:
-    notification_email: lite-ops@digital.beis.gov.uk
-    notification_email_from: lite-qa@digital.beis.gov.uk
+    notification_email: lite-ops@digital.uktrade.gov.uk
+    notification_email_from: lite-qa@digital.uktrade.gov.uk
     smtp_server: smtp-relay.gmail.com
     vip: 10.100.20.7
     domains:
-      - ukbeisalb.licensing-qa.service.trade.gov.uk
+      - uktradealb.licensing-qa.service.trade.gov.uk
       - www.licensing-qa.service.trade.gov.uk 
   roles: 
     - loadbalancer

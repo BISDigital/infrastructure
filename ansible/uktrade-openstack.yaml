@@ -24,47 +24,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-- hosts: beis-mgmt-ipa-masters
-  tasks:
-  - name: Create DNS entries for app OpenShift nodes
-    shell:
-      kinit admin -k -t {{ ipaserver_keytab }} ;
-      hname={{ item }} ;
-      ip_addr={{ hostvars[item]['ansible_host'] }} ;
-      ipa dnsrecord-add licensing.service.trade.gov.uk.test ${hname%%.*} --a-rec $ip_addr >>
-        /root/ipa_{{ item }}.log ;
-      ipa dnsrecord-add 1.100.10.in-addr.arpa. ${ip_addr##*.} --ptr-rec {{ item }}. >>
-        /root/ipa_{{ item }}.log ;
-    args:
-      executable: /bin/bash
-      creates: /root/ipa_{{ item }}.log
-    with_items:
-      - "{{ groups['beis-app-openshift'] }}"
-      - "{{ groups['beis-app'] }}"
-  - name: Create DNS entries for svc OpenShift nodes
-    shell:
-      kinit admin -k -t {{ ipaserver_keytab }} ;
-      hname={{ item }} ;
-      ip_addr={{ hostvars[item]['ansible_host'] }} ;
-      ipa dnsrecord-add licensing.service.trade.gov.uk.test ${hname%%.*} --a-rec $ip_addr >>
-        /root/ipa_{{ item }}.log ;
-      ipa dnsrecord-add 20.100.10.in-addr.arpa. ${ip_addr##*.} --ptr-rec {{ item }}. >>
-        /root/ipa_{{ item }}.log ;
-    args:
-      executable: /bin/bash
-      creates: /root/ipa_{{ item }}.log
-    with_items:
-      - "{{ groups['beis-svc-openshift'] }}"
-      - "{{ groups['beis-svc'] }}"
-  become: yes
-  tags:
-    - records
-
-- hosts: all
-  tasks:
-  - name: Manually update /etc/resolv.conf to use internal DNS
-    copy:
-      src=files/resolv.conf dest=/etc/resolv.conf
-  become: yes
-  tags:
-    - resolv
+- hosts: localhost
+  roles: 
+  - uktrade-openstack

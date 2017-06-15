@@ -128,7 +128,7 @@
     creates: /root/replicas-{{ item.split('.')[0] }}.log
   register: replicas
   with_items:
-    - "{{ groups['beis-mgmt-ipa-replicas'] }}"
+    - "{{ groups['uktrade-mgmt-ipa-replicas'] }}"
 
 - name: debug replicas
   debug: var=item.item
@@ -143,10 +143,10 @@
     - "{{ replicas.results }}"
 
 - name: Output host_passwd fact
-  debug: var={{ hostvars[groups['beis-mgmt-ipa-masters'][0]][item.split('.')[0] ~ '_passwd'] }}
+  debug: var={{ hostvars[groups['uktrade-mgmt-ipa-masters'][0]][item.split('.')[0] ~ '_passwd'] }}
   when: "'{{ item.stdout }}' is defined"
   with_items:
-    - "{{ groups['beis-mgmt-ipa-replicas'] }}"
+    - "{{ groups['uktrade-mgmt-ipa-replicas'] }}"
 
 - name: Add replica servers to ipaserver group
   shell:
@@ -157,7 +157,7 @@
     executable: /bin/bash
     creates: /root/replicas-{{ item.split('.')[0] }}.log
   with_items:
-    - "{{ groups['beis-mgmt-ipa-replicas'] }}"
+    - "{{ groups['uktrade-mgmt-ipa-replicas'] }}"
 
 - name: Add reverse DNS entries
   shell:
@@ -172,7 +172,7 @@
   failed_when: "'no modifications to be performed' not in reverse_entries.stderr \
                 and reverse_entries.rc != 0"
   with_items:
-    - "{{ groups['beis-mgmt-ipa'] }}"
+    - "{{ groups['uktrade-mgmt-ipa'] }}"
 
 - name: Fetch files from primary ipa server
   fetch: src={{ item }} dest=/tmp/{{ item | basename }} flat=yes

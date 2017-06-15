@@ -32,7 +32,7 @@
     name: "{{ item.split('/')[-1].rsplit('.')[0] }}"
     public_key_file: "{{ item }}"
   with_fileglob:
-  - roles/beis-openstack/files/*
+  - roles/uktrade-openstack/files/*
 
 ##### VPN Servers #####
 

@@ -24,25 +24,23 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-- hosts: localhost
-  roles: 
-  - cloudforms
+[OSEv3:children]
+masters
+nodes
 
-- hosts: beis-mgmt-ipa
-  tasks:
-  - name: Create DNS entries for CloudForms master node
-    shell:
-      kinit admin -k -t {{ ipaserver_keytab }} ;
-      hname={{ item }} ;
-      ip_addr={{ hostvars[item]['ansible_host'] }} ;
-      ipa dnsrecord-add licensing.service.trade.gov.uk.test ${hname%%.*} --a-rec $ip_addr >>
-        /root/ipa_{{ item }}.log ;
-      ipa dnsrecord-add 100.100.10.in-addr.arpa. ${ip_addr##*.} --ptr-rec {{ item }}. >>
-        /root/ipa_{{ item }}.log ;
-    args:
-      executable: /bin/bash
-      creates: /root/ipa_{{ item }}.log
-    with_items:
-      - "{{ groups['beis-mgmt-cloudforms'] }}"
-    when: "{{ hostvars[inventory_hostname]['iparole'] == 'master' }}"
-    become: yes
+[OSEv3:vars]
+#ansible_ssh_user=cloud-user
+ansible_become=true
+ansible_sudo=true
+deployment_type=openshift-enterprise
+containerized=true
+openshift_master_default_subdomain=mgmt.licensing.service.trade.gov.uk.test
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+
+[masters]
+uktrademom01.licensing.service.trade.gov.uk.test ansible_host=10.100.100.21 openshift_hostname=uktrademom01.licensing.service.trade.gov.uk.test openshift_public_hostname=uktrademom01.licensing.service.trade.gov.uk.test
+
+[nodes]
+uktrademom01.licensing.service.trade.gov.uk.test ansible_host=10.100.100.21 openshift_hostname=uktrademom01.licensing.service.trade.gov.uk.test openshift_public_hostname=uktrademom01.licensing.service.trade.gov.uk.test openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
+uktrademon01.licensing.service.trade.gov.uk.test ansible_host=10.100.100.22 openshift_hostname=uktrademon01.licensing.service.trade.gov.uk.test openshift_public_hostname=uktrademon01.licensing.service.trade.gov.uk.test openshift_node_labels="{'region': 'primary', 'zone': 'east'}"
+uktrademon02.licensing.service.trade.gov.uk.test ansible_host=10.100.100.23 openshift_hostname=uktrademon02.licensing.service.trade.gov.uk.test openshift_public_hostname=uktrademon02.licensing.service.trade.gov.uk.test openshift_node_labels="{'region': 'primary', 'zone': 'west'}"

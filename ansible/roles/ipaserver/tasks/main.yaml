@@ -53,7 +53,7 @@
 - name: Insert IPA server hosts entry
   lineinfile: dest=/etc/hosts regexp="^{{ hostvars[item]['ansible_host'] }}" 
               line="{{ hostvars[item]['ansible_host'] }}\t{{ hostvars[item]['inventory_hostname'] }}\t{{ hostvars[item]['ansible_hostname'] }}"
-  with_items: "{{ groups['beis-mgmt-ipa'] }}"
+  with_items: "{{ groups['uktrade-mgmt-ipa'] }}"
 
 - include: master.yaml
   when: "{{ hostvars[inventory_hostname]['iparole'] == 'master' }}"
