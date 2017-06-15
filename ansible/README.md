@@ -14,14 +14,14 @@ The following command will build an entire OpenStack environment including all
 the aforementioned pieces running RHEL7. They will be accessible via a golden
 host through ssh.
 
-`$ ansible-playbook -i hosts/beis uktrade-openstack.yaml`
+`$ ansible-playbook -i hosts/uktrade uktrade-openstack.yaml`
 
 ### Red Hat 
 In order to update the systems and install additional software, each platform
 needs registering at the Red Hat Developer Community. 
 `http://developers.redhat.com`
 
-`$ ansible-playbook -i hosts/beis -u cloud-user uktrade-platforms.yaml`
+`$ ansible-playbook -i hosts/uktrade -u cloud-user uktrade-platforms.yaml`
 
 ### IPA
 
@@ -30,13 +30,13 @@ replica configuration. The build will ask for two passwords, and these are
 used to set the passwords for the build, so generate a password or two and
 jot them down. 
 
-`$ ansible-playbook -i hosts/beis -u cloud-user uktrade-ipaserver.yaml`
+`$ ansible-playbook -i hosts/uktrade -u cloud-user uktrade-ipaserver.yaml`
 
 ## OpenStack
 After you have got to this point, you need to change some OpenStack parameters.
 
 ```
-$ ansible-playbook -i hosts/beis uktrade-openstack2.yaml
+$ ansible-playbook -i hosts/uktrade uktrade-openstack2.yaml
 ```
 
 ## External DNS
@@ -45,7 +45,7 @@ Docker Hub. A playbook has been created to configure the container as it is
 100% ephemeral by design in master/slave configuration.
 
 ```
-$ ansible-playbook -u cloud-user -i hosts/beis uktrade-remotedns.yaml
+$ ansible-playbook -u cloud-user -i hosts/uktrade uktrade-remotedns.yaml
 ````
 
 ### OpenShift
