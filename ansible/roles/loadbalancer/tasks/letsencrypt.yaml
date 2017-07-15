@@ -29,32 +29,80 @@
   with_items:
     - git
     - bc
+  when: pxyrole == 'MASTER'
 
 - name: Checkout Letsencrypt
   git: repo=https://github.com/letsencrypt/letsencrypt.git
        dest=/opt/letsencrypt
+  when: pxyrole == 'MASTER' and __DEVEL__ is undefined
 
+# HAProxy needs to be stopped as it listens on port 80 and this is needed for 
+# domain verification by Letsencrypt
 - name: Stop haproxy
   service: name=haproxy state=stopped
+  notify:
+    - Enable and start haproxy
 
-- name: Run letsencrypt
-  command: >
-    /opt/letsencrypt/letsencrypt-auto --standalone --agree-tos 
-    certonly --standalone-supported-challenges http-01
-    -d {{ domains[0] }} -d {{ domains[1] }}
+- name: Fetch letsencrypt certificates
+  command: |
+    /opt/letsencrypt/letsencrypt-auto --standalone --agree-tos --force-renewal
+    certonly --preferred-challenges http-01 -d "{{ domains | join(",") }}"
     creates=/etc/letsencrypt/live/{{ domains[0] }}/fullchain.pem
+  when: pxyrole == 'MASTER' and __DEVEL__ is undefined
+
+- name: Create letsencrypt live directory __DEVEL__
+  file:
+    path: /etc/letsencrypt/live/{{ domains[0] }}-0001
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+  when: pxyrole == 'MASTER' and __DEVEL__ is defined
+
+- name: Create letsencrypt certificates __DEVEL__
+  command: |
+    openssl req -new -newkey rsa:1024 -nodes -keyout \
+      /etc/letsencrypt/live/{{ domains[0] }}-0001/privkey.pem \
+      -out /etc/letsencrypt/live/{{ domains[0] }}-0001/fullchain.pem \
+      -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN={{ domains[0] }}"
+    creates=/etc/letsencrypt/live/{{ domains[0] }}/fullchain.pem
+  when: pxyrole == 'MASTER' and __DEVEL__ is defined
+
+- name: Create the cert directory
+  file:
+    path: /etc/haproxy/certs
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
 
 - name: Create combined certfile
-  command: >
-    cat /etc/letsencrypt/live/{{ domains[0] }}/fullchain.pem 
-    /etc/letsencrypt/live/{{ domains[0] }}/privkey.pem > 
-    /etc/haproxy/certs/{{ domains[0] }}.pem
-    creates=/etc/haproxy/certs/{{ domains[0] }}.pem
+  shell: |
+    cat /etc/letsencrypt/live/{{ domains[0] }}-0001/fullchain.pem \
+      /etc/letsencrypt/live/{{ domains[0] }}-0001/privkey.pem > \
+      /etc/haproxy/certs/{{ domains[0] }}.pem
+  args:
+    creates: /etc/haproxy/certs/{{ domains[0] }}.pem
+  when: pxyrole == 'MASTER'
 
-- name: Secure the cert
-  file: path=/etc/haproxy/certs mode=go-rwx recurse=yes
+- name: Fetch the pem file from the master
+  fetch:
+    src: /etc/haproxy/certs/{{ domains[0] }}.pem
+    dest: /tmp/{{ domains[0] }}.pem
+    flat: yes
+  when: pxyrole == 'MASTER'
 
-- name: Fetch the cert
-  fetch: src=/etc/haproxy/certs/{{ domains[0] }}.pem 
-         dest=/tmp/{{ domains[0] }}.pem
+- name: Copy the cert to slaves
+  copy: 
+    src: /tmp/{{ domains[0] }}.pem
+    dest: /etc/haproxy/certs/{{ domains[0] }}.pem
+    mode: 0600
+  when: pxyrole == 'BACKUP'
+
+- name: Restore SELinux contexts
+  sefcontext:
+    target: /etc/haproxy/certs/{{ domains[0] }}.pem
+    setype: etc_t
+    state: present 
+  when: pxyrole == 'BACKUP' and selinux_result.stdout == 'Enforcing'
 
