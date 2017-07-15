@@ -24,6 +24,11 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# Determine SELinux state
+- name: Check SELinux is running
+  command: getenforce
+  register: selinux_result
+
 # Install and configure keepalived
 - include: keepalived.yaml
   tags:
@@ -35,6 +40,6 @@
     - haproxy
 
 # Install and configure letsencrypt
-#- include: letsencrypt.yaml
-#  tags:
-#    - letsencrypt
+- include: letsencrypt.yaml
+  tags:
+    - letsencrypt
