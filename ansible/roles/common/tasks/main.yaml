@@ -32,22 +32,16 @@
 - name: Set to UTC timezone
   command: timedatectl set-timezone UTC 
 
-# Disable cloud-init since it does things like reset the hostname on boot
-# TODO: refactor block with_items when it's supported as the block terminates
-# on first failure. In this case that's good enough.
-# https://github.com/ansible/ansible/issues/13262
-- block:
-    - name: Disable cloud-init
-      service: name="{{ item }}" enabled=no
-      register: res
-      with_items:
-        - cloud-init
-        - cloud-init-local
-        - cloud-config
-        - cloud-final
-  rescue: 
-    - debug: msg=cmd.res
-      failed_when: "'not find the requested service' in res.msg"
+# Disable cloud services since they do things like reset the hostname on boot
+- name: Disable cloud services
+  service: name="{{ item }}" enabled=no
+  register: res
+  with_items:
+    - cloud-init
+    - cloud-init-local
+    - cloud-config
+    - cloud-final
+  ignore_errors: yes
 
 # Register the systems with RedHat
 - include: redhat.yaml
@@ -56,3 +50,16 @@
 
 # Flush handlers
 - meta: flush_handlers
+
+# Pause to ensure reboot has started
+- name: Wait for handlers to flush
+  pause: seconds=5
+
+# Wait for host to reboot
+- name: Wait for host to boot
+  shell: >
+    hostname
+  register: hostname_result
+  until: hostname_result.stdout.find("{{ inventory_hostname }}") != -1
+  retries: 5
+  delay: 10
