@@ -42,8 +42,8 @@ uktrade-mgmt-ipa-masters
 uktrade-mgmt-ipa-replicas
 
 [uktrade-app]
-uktradealb01.licensing.service.trade.gov.uk.test ansible_host=10.100.1.5
-uktradealb02.licensing.service.trade.gov.uk.test ansible_host=10.100.1.6
+uktradealb01.licensing.service.trade.gov.uk.test ansible_host=10.100.1.5 pxyrole=MASTER
+uktradealb02.licensing.service.trade.gov.uk.test ansible_host=10.100.1.6 pxyrole=BACKUP
 
 [uktrade-mgmt-mtr]
 uktrademtr01.licensing.service.trade.gov.uk.test ansible_host=10.100.100.15
