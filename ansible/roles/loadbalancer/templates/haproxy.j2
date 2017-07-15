@@ -8,6 +8,13 @@ global
     group       haproxy
     daemon
     log         /dev/log local0 info
+
+    ssl-default-bind-options no-sslv3
+    ssl-default-bind-ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:RSA+AESGCM:RSA+AES:!aNULL:!MD5:!DSS
+
+    ssl-default-server-options no-sslv3
+    ssl-default-server-ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:RSA+AESGCM:RSA+AES:!aNULL:!MD5:!DSS
+
     tune.ssl.default-dh-param 2048
 
     # turn on stats unix socket
@@ -18,12 +25,15 @@ global
 # use if not designated in their block
 #---------------------------------------------------------------------
 defaults
+    mode    http
+    log-format %hr\ %{+Q}r\ %Tt\ %ST\ %B
+    #option httplog
     mode                    http
     log                     global
     option                  httplog
     option                  dontlognull
     option http-server-close
-    option forwardfor       except 127.0.0.0/8
+#    option forwardfor       except 127.0.0.0/8
     option                  redispatch
     retries                 3
     timeout http-request    10s
@@ -74,6 +84,7 @@ frontend licensing-trade-gov-uk
     default_backend licensing-service-trade-gov-uk-backend
     mode http
     option tcplog
+    capture request header Host len 50
 
 backend licensing-service-trade-gov-uk-backend
     redirect scheme https if !{ ssl_fc }
@@ -88,17 +99,11 @@ backend licensing-service-trade-gov-uk-backend
 backend letsencrypt-backend
    server letsencrypt 127.0.0.1:54321
 
-frontend licensing-trade-gov-uk-443
-   bind 10.100.1.5:443
-   default_backend licensing-service-trade-gov-uk-backend-443
-   mode tcp
-   log /dev/log local0 debug
-   option tcplog
-   option socket-stats
-
-backend licensing-service-trade-gov-uk-backend-443
-   balance source
-   mode tcp
-   server      m0 10.100.1.21:443 check
-   server      m1 10.100.1.22:443 check
-   server      m2 10.100.1.23:443 check
+# CoScale agent
+listen http-in
+    bind 127.0.0.1:1936
+    stats enable
+    stats hide-version
+    stats refresh 60s
+    stats auth someuser:somepass
+    stats uri  /haproxy?stats
