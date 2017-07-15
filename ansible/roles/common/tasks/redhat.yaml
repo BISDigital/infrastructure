@@ -49,6 +49,13 @@
        state=latest
   when: "inst_result|failed"
 
+- name: Install required packages
+  yum: disablerepo=* enablerepo=rhel-7-server-rpms name={{ item }}
+       state=latest
+  with_flattened:
+    - libsemanage-python
+    - policycoreutils-python
+
 - name: Disable some repositories
   command:
     yum-config-manager --disable "{{ item }}"
@@ -57,7 +64,11 @@
 
 - name: Update all software
   yum: name=* state=latest
+  register: update_results
+
+- debug: msg="{{ update_results }}"
   notify: Restart the node
+  when: update_results.msg.find("kernel") != -1
 
 - name: Disable firewalld
   service: name=firewalld state=stopped enabled=no
