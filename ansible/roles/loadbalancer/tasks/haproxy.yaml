@@ -29,6 +29,13 @@
 
 - name: Configure haproxy
   template: src=haproxy.j2 dest=/etc/haproxy/haproxy.cfg mode=0644
+  notify: 
+    - Enable and start haproxy
 
-- name: Enable and start haproxy
-  service: name=haproxy state=started enabled=yes
+- name: Allow haproxy_connect_any
+  seboolean:
+    name: haproxy_connect_any
+    state: yes
+    persistent: yes
+  when: selinux_result.stdout == "Enforcing"
+
