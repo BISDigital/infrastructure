@@ -5,7 +5,7 @@ set -x
 
 sleep 2
 
-NS1_INTIP={{ hostvars['ukbeisns01.' ~ role_fqdn]['ansible_host'] }}
+NS1_INTIP={{ hostvars['uktradens01.' ~ role_fqdn]['ansible_host'] }}
 
 /bin/docker exec -i powerdns-slave /bin/bash <<-__EOF__
 {% for domain in domains %}

@@ -26,7 +26,7 @@
 
 - name: Create the remote access servers
   os_server:
-    name: ukbeisep01.{{ role_fqdn }}
+    name: uktradeep01.{{ role_fqdn }}
     image: rhel-7-CURRENT
     flavor: t1.medium
     key_name: justin_cook
@@ -38,11 +38,11 @@
     nics:
       - port-name: dmzport11
     meta:
-      hostname: 'ukbeisep01.{{ role_fqdn }}'
+      hostname: 'uktradeep01.{{ role_fqdn }}'
 
 - name: Create external dns master server
   os_server:
-    name: 'ukbeisns01.{{ role_fqdn }}'
+    name: 'uktradens01.{{ role_fqdn }}'
     image: rhel-7-CURRENT
     flavor: t1.medium
     key_name: justin_cook
@@ -54,12 +54,12 @@
     nics:
       - port-name: dmzport21
     meta:
-      hostname: 'ukbeisns01.{{ role_fqdn }}'
+      hostname: 'uktradens01.{{ role_fqdn }}'
       group: external_dns
 
 - name: Create external dns slave server
   os_server:
-    name: 'ukbeisns02.{{ role_fqdn }}'
+    name: 'uktradens02.{{ role_fqdn }}'
     image: rhel-7-CURRENT
     flavor: t1.medium
     key_name: justin_cook
@@ -71,7 +71,7 @@
     nics:
       - port-name: dmzport22
     meta:
-      hostname: 'ukbeisns02.{{ role_fqdn }}'
+      hostname: 'uktradens02.{{ role_fqdn }}'
       group: external_dns
 
 - name: Create the monitoring server
@@ -95,8 +95,8 @@
       hostname: "{{ item.name }}"
       group: internal_monitoring
   with_items:
-    - { name: 'ukbeismtr01.{{ role_fqdn }}', vol: "mtr01", az: "0000c-1", count: 5 }
-    - { name: 'ukbeismtr02.{{ role_fqdn }}', vol: "mtr02", az: "0000c-2", count: 6 }
+    - { name: 'uktrademtr01.{{ role_fqdn }}', vol: "mtr01", az: "0000c-1", count: 5 }
+    - { name: 'uktrademtr02.{{ role_fqdn }}', vol: "mtr02", az: "0000c-2", count: 6 }
 
 - name: Create IPA servers
   os_server:
@@ -117,8 +117,8 @@
       hostname: "{{ item.name }}"
       group: internal_services
   with_items:
-    - { name: 'ukbeisipa01.{{ role_fqdn }}', az: "0000c-1", vol: "ipa01", count: 1 }
-    - { name: 'ukbeisipa02.{{ role_fqdn }}', az: "0000c-2", vol: "ipa02", count: 2 }
+    - { name: 'uktradeipa01.{{ role_fqdn }}', az: "0000c-1", vol: "ipa01", count: 1 }
+    - { name: 'uktradeipa02.{{ role_fqdn }}', az: "0000c-2", vol: "ipa02", count: 2 }
 
 - name: Create app OpenShift master instances
   os_server:
@@ -135,9 +135,9 @@
       hostname: "{{ item.name }}"
       group: app_openshift_master
   with_items:
-    - { name: 'ukbeisaom01.{{ role_fqdn }}', az: "0000c-1", vol: "aom01", count: 1 }
-    - { name: 'ukbeisaom02.{{ role_fqdn }}', az: "0000c-2", vol: "aom02", count: 2 }
-    - { name: 'ukbeisaom03.{{ role_fqdn }}', az: "0000c-1", vol: "aom03", count: 3 }
+    - { name: 'uktradeaom01.{{ role_fqdn }}', az: "0000c-1", vol: "aom01", count: 1 }
+    - { name: 'uktradeaom02.{{ role_fqdn }}', az: "0000c-2", vol: "aom02", count: 2 }
+    - { name: 'uktradeaom03.{{ role_fqdn }}', az: "0000c-1", vol: "aom03", count: 3 }
 
 - name: Create app OpenShift node instances
   os_server:
@@ -154,8 +154,8 @@
       hostname: "{{ item.name }}"
       group: app_openshift_node
   with_items:
-    - { name: 'ukbeisaon01.{{ role_fqdn }}', az: "0000c-1", vol: "aon01", count: 1 }
-    - { name: 'ukbeisaon02.{{ role_fqdn }}', az: "0000c-2", vol: "aon02",count: 2 }
+    - { name: 'uktradeaon01.{{ role_fqdn }}', az: "0000c-1", vol: "aon01", count: 1 }
+    - { name: 'uktradeaon02.{{ role_fqdn }}', az: "0000c-2", vol: "aon02",count: 2 }
 
 - name: Create app haproxy instances
   os_server:
@@ -172,8 +172,8 @@
       hostname: "{{ item.name }}"
       group: app_loadbalancer_nodes
   with_items:
-    - { name: 'ukbeisalb01.{{ role_fqdn }}', az: "0000c-1", vol: "alb01", count: 5 }
-    - { name: 'ukbeisalb02.{{ role_fqdn }}', az: "0000c-2", vol: "alb02", count: 6 }
+    - { name: 'uktradealb01.{{ role_fqdn }}', az: "0000c-1", vol: "alb01", count: 5 }
+    - { name: 'uktradealb02.{{ role_fqdn }}', az: "0000c-2", vol: "alb02", count: 6 }
 
 - name: Create svc OpenShift master instances
   os_server:
@@ -190,9 +190,9 @@
       hostname: "{{ item.name }}"
       group: svc_openshift_master
   with_items:
-    - { name: 'ukbeissom01.{{ role_fqdn }}', az: "0000c-1", vol: "som01", count: 1 }
-    - { name: 'ukbeissom02.{{ role_fqdn }}', az: "0000c-2", vol: "som02", count: 2 }
-    - { name: 'ukbeissom03.{{ role_fqdn }}', az: "0000c-1", vol: "som03", count: 3 }
+    - { name: 'uktradesom01.{{ role_fqdn }}', az: "0000c-1", vol: "som01", count: 1 }
+    - { name: 'uktradesom02.{{ role_fqdn }}', az: "0000c-2", vol: "som02", count: 2 }
+    - { name: 'uktradesom03.{{ role_fqdn }}', az: "0000c-1", vol: "som03", count: 3 }
 
 - name: Create svc OpenShift node instances
   os_server:
@@ -209,8 +209,8 @@
       hostname: "{{ item.name }}"
       group: svc_openshift_node
   with_items:
-    - { name: 'ukbeisson01.{{ role_fqdn }}', az: "0000c-1", vol: "son01", count: 1 }
-    - { name: 'ukbeisson02.{{ role_fqdn }}', az: "0000c-2", vol: "son02", count: 2 }
+    - { name: 'uktradeson01.{{ role_fqdn }}', az: "0000c-1", vol: "son01", count: 1 }
+    - { name: 'uktradeson02.{{ role_fqdn }}', az: "0000c-2", vol: "son02", count: 2 }
 
 - name: Create svc haproxy instances
   os_server:
@@ -227,5 +227,5 @@
       hostname: "{{ item.name }}"
       group: svc_loadbalancer_nodes
   with_items:
-    - { name: 'ukbeisslb01.{{ role_fqdn }}', az: "0000c-1", vol: "slb01", count: 5 }
-    - { name: 'ukbeisslb02.{{ role_fqdn }}', az: "0000c-2", vol: "slb02", count: 6 }
+    - { name: 'uktradeslb01.{{ role_fqdn }}', az: "0000c-1", vol: "slb01", count: 5 }
+    - { name: 'uktradeslb02.{{ role_fqdn }}', az: "0000c-2", vol: "slb02", count: 6 }

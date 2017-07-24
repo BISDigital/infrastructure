@@ -14,7 +14,7 @@
     "accessModes": [ "ReadWriteMany" ],
     "nfs": {
       "path": "/var/export/ogel-service",
-      "server": "ukbeissom01"
+      "server": "uktradesom01"
     }
   }
 }

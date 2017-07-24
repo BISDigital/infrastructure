@@ -62,7 +62,7 @@
 
 - name: Create the CloudForms master
   os_server:
-    name: ukbeiscfm01.{{ role_fqdn }}
+    name: uktradecfm01.{{ role_fqdn }}
     image: cfme-rhos
     flavor: m1.small
     key_name: justin_cook
@@ -74,5 +74,5 @@
     nics:
       - port-name: mgmtport05
     meta:
-      hostname: ukbeiscfm01.{{ role_fqdn }}
+      hostname: uktradecfm01.{{ role_fqdn }}
 

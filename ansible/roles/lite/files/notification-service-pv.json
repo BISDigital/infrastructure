@@ -14,7 +14,7 @@
     "accessModes": [ "ReadWriteMany" ],
     "nfs": {
       "path": "/var/export/notification-service",
-      "server": "ukbeissom01"
+      "server": "uktradesom01"
     }
   }
 }
