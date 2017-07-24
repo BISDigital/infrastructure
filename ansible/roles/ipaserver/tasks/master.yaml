@@ -144,9 +144,9 @@
 
 - name: Output host_passwd fact
   debug: var={{ hostvars[groups['uktrade-mgmt-ipa-masters'][0]][item.split('.')[0] ~ '_passwd'] }}
-  when: "'{{ item.stdout }}' is defined"
   with_items:
     - "{{ groups['uktrade-mgmt-ipa-replicas'] }}"
+  ignore_errors: yes
 
 - name: Add replica servers to ipaserver group
   shell:
