@@ -26,6 +26,12 @@
 
 - hosts: lite-mgmt-ipa
   vars_prompt:
+    - name: "redhat_username"
+      prompt: "Enter RedHat username"
+      private: no
+    - name: "redhat_password"
+      prompt: "Enter RedHat password"
+      private: yes
     - name: "ipaserver_admin_password"
       prompt: "Enter IPA server admin password"
       private: yes
