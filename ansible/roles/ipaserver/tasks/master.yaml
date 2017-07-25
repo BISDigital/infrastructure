@@ -138,7 +138,7 @@
 - name: Promote replicas.results.item.stdout as fact
   set_fact: 
     "{{ item.item.split('.')[0] ~ '_passwd' }}": "{{ item.stdout.strip() }}"
-  when: "'{{ item.stdout }}' is defined"
+  when: "item.stdout is defined"
   with_items:
     - "{{ replicas.results }}"
 

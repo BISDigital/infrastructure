@@ -60,6 +60,6 @@
   shell: >
     hostname
   register: hostname_result
-  until: hostname_result.stdout.find("{{ inventory_hostname }}") != -1
+  until: hostname_result.stdout.find(inventory_hostname) != -1
   retries: 5
   delay: 10

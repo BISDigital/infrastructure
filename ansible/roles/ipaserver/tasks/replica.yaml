@@ -38,7 +38,7 @@
   args:
     executable: /bin/bash
     creates: /etc/ipa/default.conf
-  when: "'{{ hostvars[groups['uktrade-mgmt-ipa-masters'][0]][inventory_hostname.split('.')[0] ~ '_passwd'] }}' is defined"
+  when: "hostvars[groups['uktrade-mgmt-ipa-masters'][0]][inventory_hostname.split('.')[0] ~ '_passwd'] is defined"
 
 - name: Check if this is a replica
   shell:

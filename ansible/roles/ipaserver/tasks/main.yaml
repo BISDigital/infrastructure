@@ -56,17 +56,17 @@
   with_items: "{{ groups['uktrade-mgmt-ipa'] }}"
 
 - include: master.yaml
-  when: "{{ hostvars[inventory_hostname]['iparole'] == 'master' }}"
+  when: "hostvars[inventory_hostname]['iparole'] == 'master'"
   tags:
     - masters
 
 #- include: dnsentries.yaml
-#  when: "{{ hostvars[inventory_hostname]['iparole'] == 'master' }}"
+#  when: "hostvars[inventory_hostname]['iparole'] == 'master"
 #  tags:
 #    - dnsentries
 
 - include: replica.yaml
-  when: "{{ hostvars[inventory_hostname]['iparole'] == 'replica' }}"
+  when: "hostvars[inventory_hostname]['iparole'] == 'replica'"
   tags:
     - replicas
 
