@@ -1,3 +1,5 @@
+# lite-dev, lite-qa, lite-uat, beis-production and innovateuk branches are deprecated
+
 # UK Trade Infrastructure
 
 Thank you for visiting the UK Trade Digital Infrastructure repository. We have
