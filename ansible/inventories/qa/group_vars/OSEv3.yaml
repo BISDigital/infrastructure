@@ -24,6 +24,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Vagrant
-ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q -p2222 vagrant@127.0.0.1"'
+# LITE QA
+ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q cloud-user@51.179.219.69"'
 ansible_become: true

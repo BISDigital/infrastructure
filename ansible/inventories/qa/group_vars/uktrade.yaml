@@ -24,23 +24,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# LITE Project
-#ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q cloud-user@51.179.219.74"'
-
 # LITE QA
-#ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q cloud-user@51.179.219.69"'
-
-# LITE UAT
-#ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q cloud-user@51.179.219.85"'
-
-# DIT Playground
-ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q cloud-user@51.179.219.14"'
-
-# BEIS Production
-#ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q cloud-user@51.179.219.105"'
-
-# Vagrant
-#ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q -p2222 vagrant@127.0.0.1"'
+ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q cloud-user@51.179.219.69"'
 
 # The first entry is for reference only. By default, a reverse zone is created
 # for the subnet the master is connected to.
