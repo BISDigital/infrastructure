@@ -63,6 +63,9 @@
           - name: spire-idp-mock
             type: CNAME
             content: ukbeisalb.licensing-qa.service.trade.gov.uk.
+          - name: exporter-dashboard
+            type: CNAME
+            content: ukbeisalb.licensing-qa.service.trade.gov.uk.
   roles: 
     - powerdns
   become: yes
